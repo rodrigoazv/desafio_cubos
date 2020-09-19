@@ -89,10 +89,17 @@ class clinicHour {
     const secondDate = cContent.findIndex(
       (item: rulesHour) => item.day === date2
     )
-    console.log(firstDate, secondDate)
+    const queryInterval = cContent.slice(firstDate, secondDate+1)
+    const all = queryInterval.map((day: rulesHour) =>{
+      const obj = {
+        day: day.day,
+        freeHours: freeHours(day.day)
+      }
+      return obj
+    })
     //const element = cContent[filtred]
     //onst free = freeHours(element.day)
-    res.status(200).json()
+    res.status(200).json(all)
   }
 
   public deleteRules(req: Request, res: Response) {}

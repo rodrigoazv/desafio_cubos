@@ -1,7 +1,12 @@
 import { Hour } from '../entities/hour.entity'
 import { rulesHour } from '../entities/rules.entity'
 import { readFile } from '../services/clinicHour.service'
-
+/**
+ * 
+ * @param day recebe uma string do tipo dia no formato correto 
+ * @function freeHours recebe um dia e calcula as horas livres possiveis do dia
+ * Leva em consideracao que o ultimo horário sempre será 23:59
+ */
 export const freeHours = (day: string) => {
   const content = readFile()
 
@@ -18,7 +23,13 @@ export const freeHours = (day: string) => {
   })
   return array
 }
-
+/**
+ * 
+ * @param day recebe uma string do tipo dia no formato correto 
+ * @param value recebe um valor tipo hora, e valida se existe conflito dentro do arquivo
+ * @function freeHours recebe um dia e calcula as horas livres possiveis do dia
+ * Leva em consideracao que o ultimo horário sempre será 23:59
+ */
 export const compareHours = (value: Hour, day: string) => {
   const content = readFile()
   try {
@@ -39,12 +50,3 @@ export const compareHours = (value: Hour, day: string) => {
     return { error: true, conflictDate: err }
   }
 }
-/*for(var i = 0; i < filtred.freeHours.length(); i++){
-    let flag:number = 0;
-    let array: [{}] = [{}];
-    if(filtred.freeHours[i].start > flag){
-        array.push({start: flag , end:filtred.freeHours[i].start})
-        flag= filtred.freeHours[i].end
-    }
-    console.log(array)
-  }*/
