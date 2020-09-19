@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { rulesHour } from '../entities/rules.entity'
 import { readFile, writeFile } from '../services/clinicHour.service'
-import { verifyFile } from '../middleware/verifyFreeHours'
+import { freeHours } from '../middleware/verifyFreeHours'
 import { Hour } from '../entities/hour.entity'
-import { isValidDate } from '../helpers/isDate';
+import { isValidDate, convertMinute } from '../helpers/helps';
 
 class clinicHour {
   public storeRulesPerDay(req: Request, res: Response) {
@@ -39,7 +39,7 @@ class clinicHour {
   public storeRulesWeek(req: Request, res: Response) {
     let rules = new rulesHour()
     const fullHours = req.body.rules;
-    try{
+   
       fullHours.map((days: rulesHour) => {
         const dayHours = days.freeHours
         if(!isValidDate(days.day)){
@@ -50,19 +50,20 @@ class clinicHour {
         rules.type = days.type
         rules.day = days.day
         //insere hora
+        
+        freeHours(days.day)
         let arrayData: Hour[] = dayHours.map((data: Hour) => {
+          //convertMinute(data)
           return data
         })
         //insere hora no array de horas
-        rules.freeHours = arrayData
-        const cContent = readFile()
-        cContent.push(rules)
-        writeFile(cContent)
+        //rules.freeHours = arrayData
+        //const cContent = readFile()
+        //cContent.push(rules)
+        //writeFile(cContent)
       })
       res.status(200).json({ status: 'ok' })
-    }catch(err){
-      res.status(404).json({erro: err})
-    }
+    
   }
 
 
