@@ -67,9 +67,9 @@ class clinicHour {
           rules.freeHours = arrayData
           cContent.push(rules)
           writeFile(cContent)
+          res.status(200).json({ status: 'ok' })
         }
       })
-      res.status(200).json({ status: 'ok' })
     } catch (err) {
       res.status(200).json({ err: err })
     }
