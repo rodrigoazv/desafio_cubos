@@ -33,3 +33,7 @@ export const convertMinute = (hour: string) => {
   return vall
   
 }
+
+export const compareHours = (value: Hour, array: Hour[]) =>{
+    
+}

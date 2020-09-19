@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { rulesHour } from '../entities/rules.entity'
 import { readFile, writeFile } from '../services/clinicHour.service'
-import { freeHours } from '../middleware/verifyFreeHours'
+import { freeHours, compareHours } from '../middleware/verifyFreeHours'
 import { Hour } from '../entities/hour.entity'
-import { isValidDate, convertMinute } from '../helpers/helps';
+import { isValidDate, convertMinute } from '../helpers/helps'
 
 class clinicHour {
   public storeRulesPerDay(req: Request, res: Response) {
@@ -30,30 +30,35 @@ class clinicHour {
   }
 
   /**
-   * 
+   *
    * @param req send array of days[] with array of hour into the days
    * @param res save and verify
    */
 
-
   public storeRulesWeek(req: Request, res: Response) {
     let rules = new rulesHour()
-    const fullHours = req.body.rules;
-   
+    const fullHours = req.body.rules
+    try {
       fullHours.map((days: rulesHour) => {
         const dayHours = days.freeHours
-        if(!isValidDate(days.day)){
-          throw "not date"
+        if (!isValidDate(days.day)) {
+          throw 'not date'
         }
         const id = Math.random().toString(32).substr(2, 9)
         rules.id = id
         rules.type = days.type
         rules.day = days.day
         //insere hora
-        
-        freeHours(days.day)
+
+        const freeHourz = freeHours(days.day)
+
         let arrayData: Hour[] = dayHours.map((data: Hour) => {
           //convertMinute(data)
+          //let verify: Hour = {start: data.start, end:data.end}
+          const valid = compareHours(data, days.day)
+          if(valid?.error){
+            throw valid?.conflictDate
+          }
           return data
         })
         //insere hora no array de horas
@@ -63,9 +68,10 @@ class clinicHour {
         //writeFile(cContent)
       })
       res.status(200).json({ status: 'ok' })
-    
+    } catch(err) {
+      res.status(200).json({ err: err })
+    }
   }
-
 
   public indexRules(req: Request, res: Response) {
     const cContent = readFile()
@@ -74,7 +80,9 @@ class clinicHour {
 
   public seeRulesFree(req: Request, res: Response) {
     const cContent = readFile()
-    const filtred = cContent.findIndex((item: rulesHour) => item.day === req.body.day)
+    const filtred = cContent.findIndex(
+      (item: rulesHour) => item.day === req.body.day
+    )
     const element = cContent[filtred]
     res.status(200).json(element)
   }
