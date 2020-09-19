@@ -1,8 +1,8 @@
-export class rulesHour{
-    id: string
-    type: string
-    day: Date
-    freeHours: [
-        {start: string, end: string}
-    ]
+import { Hour } from "./hour.entity"
+
+export class rulesHour {
+  id: string
+  type: string
+  day: string
+  freeHours: Hour[]
 }
