@@ -11,3 +11,4 @@ export const writeFile = (content: rulesHour ) => {
     const updateFile = JSON.stringify(content)
     fs.writeFileSync('./src/data/rules.json', updateFile, 'utf-8')
 }
+

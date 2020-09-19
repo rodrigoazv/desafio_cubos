@@ -22,18 +22,3 @@ export const isValidDate = (dateString: string) => {
   return day > 0 && day <= monthLength[month - 1]
 }
 
-export const convertMinute = (hour: string) => {
-  
-  let start = hour.split(':')
-  
-  let startHour = parseInt(start[0], 10)*60
-  let startMinute = parseInt(start[1], 10)
-  let vall = startHour + startMinute
-
-  return vall
-  
-}
-
-export const compareHours = (value: Hour, array: Hour[]) =>{
-    
-}
