@@ -9,5 +9,6 @@ const routes: Router = Router()
 routes.post('/see?:query', clinicHour.seeRulesFree)
 routes.post('/week', clinicHour.storeRulesWeek)
 routes.get('/index', clinicHour.indexRules)
+routes.post('/special', clinicHour.storeSpecialRules)
 
 module.exports = routes

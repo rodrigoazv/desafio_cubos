@@ -5,23 +5,84 @@ import { freeHours, compareHours } from '../middleware/verifyFreeHours'
 import { Hour } from '../entities/hour.entity'
 import { isValidDate } from '../helpers/helps'
 
+//Normalize e um tipo para validar um array de dias que foram cadastrados anteriormente
+interface Normalizes {
+  day: string
+  DayMatch?: rulesHour[]
+}
 class clinicHour {
   /**
    *
    * @param req send array of days[] with array of hour into the days
    * @param res save and verify
    */
+  public storeSpecialRules(req: Request, res: Response) {
+    let rules = new rulesHour()
+    const { type, days, freeHours } = req.body
 
+    try {
+      const cContent = readFile()
+
+      const all = days.map((dayz: string) => {
+        const DayMatch: rulesHour[] = cContent.filter((item: rulesHour) => {
+          if (item.day === dayz) {
+            return item
+          }
+        })
+        freeHours.map((inputHours: Hour) => {
+          DayMatch.map(date => {
+            const log = compareHours(inputHours, date.date)
+            if (log.error) {
+              throw log.conflictDate
+            }
+            return date
+          })
+          return DayMatch
+        })
+        return { day: dayz, DayMatch }
+      }) //----------
+      days.map((dayz: string) => {
+        cContent.map((item: rulesHour, index:number) => {
+          if (item.day === dayz) {
+            const newArr = freeHours.concat(item.freeHours)
+            const newObj = {
+              id: item.id,
+              type: item.type,
+              day: item.day,
+              date: item.date,
+              freeHours: newArr
+            }
+            cContent[index] = newObj
+            writeFile(cContent)
+          }
+        })
+      })
+
+      res.status(200).json(all)
+    } catch (err) {
+      res.status(200).json({ err: err })
+    }
+  }
   public storeRulesWeek(req: Request, res: Response) {
     let rules = new rulesHour()
     const fullHours = req.body.rules
+    const dayBr = [
+      'Domingo',
+      'Segunda',
+      'Terca',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sabado'
+    ]
     try {
       fullHours.map((days: rulesHour) => {
         const cContent = readFile()
         const dayHours = days.freeHours
         const selectedItem = cContent.findIndex(
-          (item: rulesHour) => item.day === days.day
+          (item: rulesHour) => item.date === days.date
         )
+        // Se existe realiza um update
         if (selectedItem >= 0) {
           const {
             id: cId,
@@ -29,11 +90,13 @@ class clinicHour {
             day: cDay,
             freeHours: cFreeHours
           } = cContent[selectedItem]
+
           let arrayData: Hour[] = dayHours.map((data: Hour) => {
-            const valid = compareHours(data, days.day)
+            const valid = compareHours(data, days.date)
             if (valid?.error) {
               throw valid?.conflictDate
             }
+            console.log(valid)
             return data
           })
           const newArr = arrayData.concat(cFreeHours)
@@ -48,20 +111,24 @@ class clinicHour {
           return res.status(200).json({ status: 'ok', value: 'update' })
         } else {
           let arrayData: Hour[] = dayHours.map((data: Hour) => {
-            const valid = compareHours(data, days.day)
+            const valid = compareHours(data, days.date)
             if (valid?.error) {
               throw valid?.conflictDate
             }
             return data
           })
-
-          if (!isValidDate(days.day)) {
+          if (!isValidDate(days.date.toString())) {
             throw 'not date'
           }
           const id = Math.random().toString(32).substr(2, 9)
+          //revert a data para encontrar o dia da semana
+          let date = new Date(days.date.split('-').reverse().join())
+          const dayFromDate = dayBr[date.getUTCDay()]
+
           rules.id = id
           rules.type = days.type
-          rules.day = days.day
+          rules.date = days.date
+          rules.day = dayFromDate
 
           //insere hora no array de horas
           rules.freeHours = arrayData
@@ -84,16 +151,16 @@ class clinicHour {
     const { date1, date2 } = req.query
     const cContent = readFile()
     const firstDate = cContent.findIndex(
-      (item: rulesHour) => item.day === date1
+      (item: rulesHour) => item.date === date1
     )
     const secondDate = cContent.findIndex(
-      (item: rulesHour) => item.day === date2
+      (item: rulesHour) => item.date === date2
     )
-    const queryInterval = cContent.slice(firstDate, secondDate+1)
-    const all = queryInterval.map((day: rulesHour) =>{
+    const queryInterval = cContent.slice(firstDate, secondDate + 1)
+    const all = queryInterval.map((day: rulesHour) => {
       const obj = {
-        day: day.day,
-        freeHours: freeHours(day.day)
+        day: day.date,
+        freeHours: freeHours(day.date)
       }
       return obj
     })
