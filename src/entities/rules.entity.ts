@@ -2,11 +2,8 @@ import { Hour } from "./hour.entity"
 
 export class rulesHour {
   id: string
-  type: {
-    type: string
-    days: string[]
-  }
+  type: string
   date: string
-  day: string
+  day: number
   freeHours: Hour[]
 }

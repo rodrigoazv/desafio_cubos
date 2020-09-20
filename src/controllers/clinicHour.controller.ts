@@ -1,15 +1,10 @@
 import { Request, Response } from 'express'
 import { rulesHour } from '../entities/rules.entity'
-import { readFile, writeFile } from '../services/clinicHour.service'
+import { readFile, writeFile, updateHour } from '../services/clinicHour.service'
 import { freeHours, compareHours } from '../middleware/verifyFreeHours'
 import { Hour } from '../entities/hour.entity'
 import { isValidDate } from '../helpers/helps'
 
-//Normalize e um tipo para validar um array de dias que foram cadastrados anteriormente
-interface Normalizes {
-  day: string
-  DayMatch?: rulesHour[]
-}
 class clinicHour {
   /**
    *
@@ -18,14 +13,15 @@ class clinicHour {
    */
   public storeSpecialRules(req: Request, res: Response) {
     let rules = new rulesHour()
-    const { type, days, freeHours } = req.body
-
+    let { type, days, freeHours } = req.body
+    if(type==='Daily'){
+      days = [0, 1, 2, 3, 4, 5, 6]
+    }
+    let cContent = readFile()
     try {
-      const cContent = readFile()
-
-      const all = days.map((dayz: string) => {
+      days.map((dayz: number) => {
         const DayMatch: rulesHour[] = cContent.filter((item: rulesHour) => {
-          if (item.day === dayz) {
+          if (item.day * 1 === dayz * 1) {
             return item
           }
         })
@@ -35,30 +31,35 @@ class clinicHour {
             if (log.error) {
               throw log.conflictDate
             }
-            return date
           })
-          return DayMatch
         })
         return { day: dayz, DayMatch }
       }) //----------
-      days.map((dayz: string) => {
-        cContent.map((item: rulesHour, index:number) => {
-          if (item.day === dayz) {
-            const newArr = freeHours.concat(item.freeHours)
-            const newObj = {
-              id: item.id,
-              type: item.type,
-              day: item.day,
-              date: item.date,
-              freeHours: newArr
-            }
-            cContent[index] = newObj
-            writeFile(cContent)
+      days.map((dayz: number) => {
+        cContent.map((item: rulesHour, index: number) => {
+          if (item.day*1 === dayz * 1) {
+            cContent = updateHour(index, freeHours)
           }
+          //if((item.day*1 === dayz * 1)&&)
         })
       })
-
-      res.status(200).json(all)
+      days.map((validDay: number) =>{
+        const slash = {
+          id: Math.random().toString(32).substr(2, 9),
+          day: validDay*1,
+          type: type,
+          date: '*',
+          freeHours: freeHours
+        }
+        cContent.push(slash)
+      })
+      /*rules.id = Math.random().toString(32).substr(2, 9)
+      rules.day = days
+      rules.type = type
+      rules.date = '*'
+      rules.freeHours = freeHours*/
+      writeFile(cContent)
+      res.status(200).json({ status: 'ok' })
     } catch (err) {
       res.status(200).json({ err: err })
     }
@@ -66,15 +67,6 @@ class clinicHour {
   public storeRulesWeek(req: Request, res: Response) {
     let rules = new rulesHour()
     const fullHours = req.body.rules
-    const dayBr = [
-      'Domingo',
-      'Segunda',
-      'Terca',
-      'Quarta',
-      'Quinta',
-      'Sexta',
-      'Sabado'
-    ]
     try {
       fullHours.map((days: rulesHour) => {
         const cContent = readFile()
@@ -84,30 +76,7 @@ class clinicHour {
         )
         // Se existe realiza um update
         if (selectedItem >= 0) {
-          const {
-            id: cId,
-            type: cType,
-            day: cDay,
-            freeHours: cFreeHours
-          } = cContent[selectedItem]
-
-          let arrayData: Hour[] = dayHours.map((data: Hour) => {
-            const valid = compareHours(data, days.date)
-            if (valid?.error) {
-              throw valid?.conflictDate
-            }
-            console.log(valid)
-            return data
-          })
-          const newArr = arrayData.concat(cFreeHours)
-          const newObj = {
-            id: cId,
-            type: cType,
-            day: cDay,
-            freeHours: newArr
-          }
-          cContent[selectedItem] = newObj
-          writeFile(cContent)
+          updateHour(selectedItem, dayHours)
           return res.status(200).json({ status: 'ok', value: 'update' })
         } else {
           let arrayData: Hour[] = dayHours.map((data: Hour) => {
@@ -123,7 +92,7 @@ class clinicHour {
           const id = Math.random().toString(32).substr(2, 9)
           //revert a data para encontrar o dia da semana
           let date = new Date(days.date.split('-').reverse().join())
-          const dayFromDate = dayBr[date.getUTCDay()]
+          const dayFromDate: number = date.getDay() * 1
 
           rules.id = id
           rules.type = days.type
