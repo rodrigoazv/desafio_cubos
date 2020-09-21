@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "runi": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "run": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc"
   },
