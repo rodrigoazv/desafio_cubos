@@ -14,11 +14,14 @@ class clinicHour {
   public storeSpecialRules(req: Request, res: Response) {
     let rules = new rulesHour()
     let { type, days, freeHours } = req.body
-    if(type==='Daily'){
+    let cContent = readFile()
+    if (type === 'Daily') {
       days = [0, 1, 2, 3, 4, 5, 6]
     }
-    let cContent = readFile()
     try {
+      freeHours.map((Hours: Hour) => {
+        if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
+      })
       days.map((dayz: number) => {
         const DayMatch: rulesHour[] = cContent.filter((item: rulesHour) => {
           if (item.day * 1 === dayz * 1) {
@@ -35,36 +38,95 @@ class clinicHour {
         })
         return { day: dayz, DayMatch }
       }) //----------
-      days.map((dayz: number) => {
-        cContent.map((item: rulesHour, index: number) => {
-          if (item.day*1 === dayz * 1) {
-            cContent = updateHour(index, freeHours)
-          }
-          //if((item.day*1 === dayz * 1)&&)
+      if (type !== 'Daily') {
+        days.map((dayz: number) => {
+          cContent.map((item: rulesHour, index: number) => {
+            if (item.day * 1 === dayz * 1 && item.type !== 'Daily') {
+              cContent = updateHour(index, freeHours)
+            }
+            //if((item.day*1 === dayz * 1)&&)
+          })
         })
-      })
-      days.map((validDay: number) =>{
+      }
+      days.map((validDay: number) => {
         const slash = {
           id: Math.random().toString(32).substr(2, 9),
-          day: validDay*1,
+          day: validDay * 1,
           type: type,
           date: '*',
           freeHours: freeHours
         }
         cContent.push(slash)
       })
-      /*rules.id = Math.random().toString(32).substr(2, 9)
-      rules.day = days
-      rules.type = type
-      rules.date = '*'
-      rules.freeHours = freeHours*/
       writeFile(cContent)
       res.status(200).json({ status: 'ok' })
     } catch (err) {
       res.status(200).json({ err: err })
     }
   }
-  public storeRulesWeek(req: Request, res: Response) {
+   /**
+   *
+   * @param req send array of days[] with array of hour into the days
+   * @param res save and verify
+   */
+  public storeOneRule(req: Request, res: Response) {
+    let rules = new rulesHour()
+    const { type, day, freeHours, date } = req.body
+    try {
+      freeHours.map((Hours: Hour) => {
+        if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
+      })
+
+      const cContent = readFile()
+      const dayHours = freeHours
+      const selectedItem = cContent.findIndex(
+        (item: rulesHour) => item.date === date
+      )
+      // Se existe realiza um update
+      if (selectedItem >= 0) {
+        updateHour(selectedItem, dayHours)
+        return res.status(200).json({ status: 'ok', value: 'update' })
+      } else {
+        let arrayData: Hour[] = dayHours.map((data: Hour) => {
+          const valid = compareHours(data, date)
+          if (valid?.error) {
+            throw valid?.conflictDate
+          }
+          const validDaily = compareHours(data, '*')
+            if (validDaily?.error) {
+              throw validDaily?.conflictDate
+            }
+          return data
+        })
+        if (!isValidDate(date.toString())) {
+          throw 'not date'
+        }
+        const id = Math.random().toString(32).substr(2, 9)
+        //revert a data para encontrar o dia da semana
+        let dateNew = new Date(date.split('-').reverse().join())
+        const dayFromDate: number = dateNew.getDay() * 1
+
+        rules.id = id
+        rules.type = type
+        rules.date = date
+        rules.day = dayFromDate
+
+        //insere hora no array de horas
+        rules.freeHours = arrayData
+        cContent.push(rules)
+        writeFile(cContent)
+        res.status(200).json({ status: 'ok' })
+      }
+    } catch (err) {
+      res.status(200).json({ err: err })
+    }
+  }
+ /**
+   *
+   * @param req send array of days[] with array of hour into the days
+   * @param res save and verify
+   */
+  public storeMultipleRules(req: Request, res: Response) {
     let rules = new rulesHour()
     const fullHours = req.body.rules
     try {
@@ -80,9 +142,15 @@ class clinicHour {
           return res.status(200).json({ status: 'ok', value: 'update' })
         } else {
           let arrayData: Hour[] = dayHours.map((data: Hour) => {
+            //Comparar com o dia
             const valid = compareHours(data, days.date)
             if (valid?.error) {
               throw valid?.conflictDate
+            }
+            //Comparar com ocorrências diárias
+            const validDaily = compareHours(data, '*')
+            if (validDaily?.error) {
+              throw validDaily?.conflictDate
             }
             return data
           })
@@ -125,43 +193,40 @@ class clinicHour {
     const secondDate = cContent.findIndex(
       (item: rulesHour) => item.date === date2
     )
+    const firstDaily = cContent.findIndex(
+      (item: rulesHour) => item.date === '*'
+    )
+    const lastDaily = cContent.findIndex(
+      (item: rulesHour) => item.date === '*' && item.day ===6
+    )
     const queryInterval = cContent.slice(firstDate, secondDate + 1)
-    const all = queryInterval.map((day: rulesHour) => {
+    const query = queryInterval.map((day: rulesHour) => {
       const obj = {
         day: day.date,
         freeHours: freeHours(day.date)
       }
       return obj
     })
-    //const element = cContent[filtred]
-    //onst free = freeHours(element.day)
-    res.status(200).json(all)
+    const dailyInterval = cContent.slice(firstDaily, lastDaily+1)
+    const daily = dailyInterval.map((day: rulesHour) => {
+      const obj = {
+        day: day.date,
+        freeHours: freeHours(day.date)
+      }
+      return obj
+    })
+
+    res.status(200).json({query: query, daily: daily})
   }
 
-  public deleteRules(req: Request, res: Response) {}
+  public deleteRules(req: Request, res: Response) {
+    const { id } = req.params
+    const currentContent = readFile()
+    const selectedItem = currentContent.findIndex((item: rulesHour) => item.id === id)
+    currentContent.splice(selectedItem, 1)
+    writeFile(currentContent)
+    res.status(200).json({deleted: currentContent})
+  }
 }
 
 export default new clinicHour()
-
-/*/public storeRulesPerDay(req: Request, res: Response) {
-    let rules = new rulesHour()
-
-    const { type, day } = req.body
-    const dayHours = req.body.freeHours
-
-    const id = Math.random().toString(32).substr(2, 9)
-    rules.id = id
-    rules.type = type
-    rules.day = day
-    //insere hora
-    let arrayData: [Hour] = dayHours.map((data: Hour) => {
-      return data
-    })
-    //insere hora no array de horas
-    rules.freeHours = arrayData
-    const cContent = readFile()
-    cContent.push(rules)
-    writeFile(cContent)
-
-    res.status(200).json({ status: 'ok' })
-  } */
