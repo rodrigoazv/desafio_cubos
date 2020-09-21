@@ -2,7 +2,7 @@ import app from '../app'
 import request from 'supertest'
 import {clear} from './utils/clear'
 
-describe('Insert One', () => {
+describe('Strees insert', () => {
   beforeAll(async () => {
     await clear()
   })
@@ -91,7 +91,7 @@ describe('Insert One', () => {
       })
       expect(response.status).toBe(200)
   })
-  it('Daily case', async () => {
+  it('Should be return 400 if there is conflict with any day', async () => {
     const response = await request(app)
       .post('/specialrules')
       .send({
@@ -106,7 +106,7 @@ describe('Insert One', () => {
       })
       expect(response.status).toBe(400)
   })
-  it('Daily case', async () => {
+  it('Should be return 200 if there is no conflict with any day', async () => {
     const response = await request(app)
       .post('/specialrules')
       .send({
@@ -121,12 +121,27 @@ describe('Insert One', () => {
       })
       expect(response.status).toBe(200)
   })
-  it('Daily case', async () => {
+  it('Should be return 400 for special day', async () => {
     const response = await request(app)
       .post('/specialrules')
       .send({
         date: '13-10-2030',
         type: 'Day',
+        freeHours: [
+          {
+            start: '11:50',
+            end: '11:54'
+          }
+        ]
+      })
+      expect(response.status).toBe(400)
+  })
+  it('Should be return 200 if there is no conflict with any day', async () => {
+    const response = await request(app)
+      .post('/specialrules')
+      .send({
+        date: '*',
+        type: 'Daily',
         freeHours: [
           {
             start: '11:50',
@@ -136,6 +151,7 @@ describe('Insert One', () => {
       })
       expect(response.status).toBe(400)
   })
+  
   
 })
 

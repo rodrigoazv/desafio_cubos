@@ -21,16 +21,18 @@ class clinicHour {
       freeHours.map((Hours: Hour) => {
         if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
       })
-      days.map((dayz: number) => {//para cada dia
+      days.map((dayz: number) => {
+        //para cada dia
         const DayMatch: rulesHour[] = cContent.filter((item: rulesHour) => {
           if (item.day * 1 === dayz * 1) {
             return item
           }
-        })//retorne todos os matchs
-        freeHours.map((inputHours: Hour) => {//para cada hora do dia
-          DayMatch.map(date => {//compare com o match
+        }) //retorne todos os matchs
+        freeHours.map((inputHours: Hour) => {
+          //para cada hora do dia
+          DayMatch.map(date => {
+            //compare com o match
             const log = compareHours(inputHours, date.date)
-            console.log(log)
             if (log.error) {
               throw log.conflictDate
             }
@@ -38,9 +40,10 @@ class clinicHour {
         })
         return { day: dayz, DayMatch }
       }) //----------
+      const id = Math.random().toString(32).substr(2, 9)
       days.map((validDay: number) => {
         const slash = {
-          id: Math.random().toString(32).substr(2, 9),
+          id: id,
           day: validDay * 1,
           type: type,
           date: '*',
@@ -54,7 +57,7 @@ class clinicHour {
       res.status(400).json({ err: err })
     }
   }
-   /**
+  /**
    *
    * @param req send array of days[] with array of hour into the days
    * @param res save and verify
@@ -83,9 +86,9 @@ class clinicHour {
             throw valid?.conflictDate
           }
           const validDaily = compareHours(data, '*')
-            if (validDaily?.error) {
-              throw validDaily?.conflictDate
-            }
+          if (validDaily?.error) {
+            throw validDaily?.conflictDate
+          }
           return data
         })
         if (!isValidDate(date.toString())) {
@@ -111,7 +114,7 @@ class clinicHour {
       res.status(400).json({ err: err })
     }
   }
- /**
+  /**
    *
    * @param req send array of days[] with array of hour into the days
    * @param res save and verify
@@ -135,7 +138,7 @@ class clinicHour {
       (item: rulesHour) => item.date === '*'
     )
     const lastDaily = cContent.findIndex(
-      (item: rulesHour) => item.date === '*' && item.day ===6
+      (item: rulesHour) => item.date === '*' && item.day === 6
     )
     const queryInterval = cContent.slice(firstDate, secondDate + 1)
     const query = queryInterval.map((day: rulesHour) => {
@@ -145,7 +148,7 @@ class clinicHour {
       }
       return obj
     })
-    const dailyInterval = cContent.slice(firstDaily, lastDaily+1)
+    const dailyInterval = cContent.slice(firstDaily, lastDaily + 1)
     const daily = dailyInterval.map((day: rulesHour) => {
       const obj = {
         day: day.date,
@@ -154,16 +157,20 @@ class clinicHour {
       return obj
     })
 
-    res.status(200).json({query: query, daily: daily})
+    res.status(200).json({ query: query, daily: daily })
   }
 
   public deleteRules(req: Request, res: Response) {
     const { id } = req.params
     const currentContent = readFile()
-    const selectedItem = currentContent.findIndex((item: rulesHour) => item.id === id)
-    currentContent.splice(selectedItem, 1)
-    writeFile(currentContent)
-    res.status(200).json({deleted: currentContent})
+    const selectedItem = currentContent.filter((item: rulesHour) => {
+      if (item.id !== id) {
+        return item
+      }
+    })
+    //currentContent.splice(selectedItem, 1)
+    writeFile(selectedItem)
+    res.status(200).json({ afterDeleted: selectedItem })
   }
 }
 
