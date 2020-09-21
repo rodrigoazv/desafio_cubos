@@ -18,6 +18,9 @@ class clinicHour {
       days = [0, 1, 2, 3, 4, 5, 6]
     }
     try {
+      if(!type || !days || !freeHours){
+        throw 'expected 3 arguments: type, day[], freeHours[{hours}]'
+      }
       freeHours.map((Hours: Hour) => {
         if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
       })
@@ -66,6 +69,9 @@ class clinicHour {
     let rules = new rulesHour()
     const { type, freeHours, date } = req.body
     try {
+      if(!type || !date || !freeHours){
+        throw 'expected 3 arguments: type, date, freeHours[{hours}]'
+      }
       freeHours.map((Hours: Hour) => {
         if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
       })
@@ -127,6 +133,9 @@ class clinicHour {
 
   public seeRulesFree(req: Request, res: Response) {
     const { date1, date2 } = req.query
+    if(!date1 || !date2 ){
+      throw 'expected 2 dates in params :date1, date2]'
+    }
     const cContent = readFile()
     const firstDate = cContent.findIndex(
       (item: rulesHour) => item.date === date1
