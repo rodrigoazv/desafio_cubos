@@ -9,7 +9,7 @@ const routes: Router = Router()
 routes.post('/see?:query', clinicHour.seeRulesFree)
 routes.post('/onerule', clinicHour.storeOneRule)
 routes.get('/index', clinicHour.indexRules)
-routes.post('/special', clinicHour.storeSpecialRules)
+routes.post('/specialrules', clinicHour.storeSpecialRules)
 routes.delete('/delete/:id', clinicHour.deleteRules)
 
 module.exports = routes

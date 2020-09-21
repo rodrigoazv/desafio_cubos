@@ -51,7 +51,7 @@ class clinicHour {
       writeFile(cContent)
       res.status(200).json({ status: 'ok' })
     } catch (err) {
-      res.status(200).json({ err: err })
+      res.status(400).json({ err: err })
     }
   }
    /**

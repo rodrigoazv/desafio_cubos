@@ -1,7 +1,7 @@
 const fs = require('fs')
-import { rulesHour } from '@entities/rules.entity'
-import { Hour } from '@entities/hour.entity'
-import { compareHours } from '@middleware/verifyFreeHours'
+import { rulesHour } from '../entities/rules.entity'
+import { Hour } from '../entities/hour.entity'
+import { compareHours } from '../middleware/verifyFreeHours'
 
 export const readFile = () => {
     const content = fs.readFileSync('./src/data/rules.json', 'utf-8')
@@ -11,6 +11,9 @@ export const readFile = () => {
 export const writeFile = (content: rulesHour ) => {
     const updateFile = JSON.stringify(content)
     fs.writeFileSync('./src/data/rules.json', updateFile, 'utf-8')
+}
+export const sortAll = () => {
+  const cContent = readFile()
 }
 
 export const updateHour = (field: number, hour: Hour[]) =>{

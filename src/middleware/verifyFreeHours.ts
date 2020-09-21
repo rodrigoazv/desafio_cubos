@@ -1,6 +1,6 @@
-import { Hour } from '@entities/hour.entity'
-import { rulesHour } from '@entities/rules.entity'
-import { readFile } from '@services/clinicHour.service'
+import { Hour } from '../entities/hour.entity'
+import { rulesHour } from '../entities/rules.entity'
+import { readFile } from '../services/clinicHour.service'
 /**
  * 
  * @param date recebe uma string do tipo dia no formato correto 
