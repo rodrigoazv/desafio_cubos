@@ -163,14 +163,24 @@ class clinicHour {
   public deleteRules(req: Request, res: Response) {
     const { id } = req.params
     const currentContent = readFile()
-    const selectedItem = currentContent.filter((item: rulesHour) => {
-      if (item.id !== id) {
-        return item
+    try{
+      const idExist = currentContent.findIndex(
+        (item: rulesHour) => item.id === id
+      )
+      if(!(idExist >= 0)){
+        throw 'No id find'
       }
-    })
-    //currentContent.splice(selectedItem, 1)
-    writeFile(selectedItem)
-    res.status(200).json({ afterDeleted: selectedItem })
+      const selectedItem = currentContent.filter((item: rulesHour) => {
+        if (item.id !== id) {
+          return item
+        }
+      })
+      writeFile(selectedItem)
+      res.status(200).json({ afterDeleted: selectedItem })
+    }catch(err){
+      res.status(400).json({ err: err })
+    }
+    
   }
 }
 
