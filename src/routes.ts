@@ -6,7 +6,7 @@ const routes: Router = Router()
 
 //routes.post('/perday', clinicHour.storeRulesPerDay)
 //routes.post('/all', clinicHour.storeRulesAllDays)
-routes.post('/see?:query', clinicHour.seeRulesFree)
+routes.get('/see?:query', clinicHour.seeRulesFree)
 routes.post('/onerule', clinicHour.storeOneRule)
 routes.get('/index', clinicHour.indexRules)
 routes.post('/specialrules', clinicHour.storeSpecialRules)

@@ -1,7 +1,11 @@
-import { sortHour, sortedAll } from '../services/clinicHour.service'
+import { sortHour } from '../services/clinicHour.service'
 import { rulesHour } from '@entities/rules.entity'
+import {clear} from './utils/clear'
 
 describe('Is valid?', () => {
+  afterAll(() => {
+    return clear()
+  })
   it('Value of date should be true', () => {
     const noSort: rulesHour = {
       id: '5u061deh2',

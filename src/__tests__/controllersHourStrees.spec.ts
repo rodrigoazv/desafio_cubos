@@ -3,8 +3,11 @@ import request from 'supertest'
 import {clear} from './utils/clear'
 
 describe('Strees insert', () => {
-  beforeAll(async () => {
-    await clear()
+  beforeAll(() => {
+    return clear()
+  })
+  afterAll(() => {
+    return clear()
   })
 
   it('Should insert data return true if no conflict', async () => {
@@ -155,3 +158,105 @@ describe('Strees insert', () => {
   
 })
 
+describe('Teste delete value of rules', () => {
+
+  beforeAll(() => {
+    return clear()
+  })
+  afterAll(() => {
+      return clear()
+    })
+  it('Should be return 200 for register Day example', async () => {
+      const response = await request(app)
+        .post('/onerule')
+        .send({
+          date: '11-10-2020',
+          type: 'Day',
+          freeHours: [
+            {
+              start: '11:40',
+              end: '11:50'
+            }
+          ]
+        })
+        expect(response.status).toBe(201)
+    })
+    it('Should be return 200 for register Day example', async () => {
+      const response = await request(app)
+        .post('/onerule')
+        .send({
+          date: '12-10-2020',
+          type: 'Day',
+          freeHours: [
+            {
+              start: '11:40',
+              end: '11:50'
+            }
+          ]
+        })
+        expect(response.status).toBe(201)
+    })
+    it('Should be return 200 for register Day example', async () => {
+      const response = await request(app)
+        .post('/onerule')
+        .send({
+          date: '13-10-2020',
+          type: 'Day',
+          freeHours: [
+            {
+              start: '11:40',
+              end: '11:50'
+            }
+          ]
+        })
+        expect(response.status).toBe(201)
+    })
+  it('Should be return interval of query with days', async () => {
+      const response = await request(app)
+          .get('/see?date1=11-10-2020&date2=13-10-2020')
+      const dataResponse = JSON.parse(response.text)
+      expect(dataResponse.query.length).toBe(3)
+  })
+
+})
+describe('Teste delete value of rules', () => {
+
+  beforeAll(() => {
+    return clear()
+  })
+  afterAll(() => {
+    return clear()
+  })
+  it('Should be return 200 for register Daily example', async () => {
+    const response = await request(app)
+      .post('/specialrules')
+      .send({
+        date: '*',
+        type: 'Daily',
+        freeHours: [
+          {
+            start: '11:40',
+            end: '11:50'
+          }
+        ]
+      })
+      expect(response.status).toBe(200)
+  })
+  it('Should be return 200 for exclude Daily rule', async () =>{
+    
+    const responseGet = await request(app)
+      .get('/index')
+    const responseDel = await request(app)
+      .delete(`/delete/${responseGet.body[0].id}`)
+
+    expect(responseDel.status).toBe(200)
+  })
+
+  it('Should be return 400 for not find id', async () =>{
+    const responseDel = await request(app)
+      .delete(`/delete/1`)
+
+    expect(responseDel.status).toBe(400)
+  })
+
+})
