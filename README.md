@@ -1,4 +1,14 @@
 # Cubos
+### Instalação
+[comment]: <> (Clone cubos repositório)
+- git clone git@github.com:rodrigoazv/desafio_cubos.git
+
+[comment]: <> (Entre no projeto)
+- cd desafio_cubos
+
+[comment]: <> (Rode preview)
+[comment]: <> (Certifique-se que o arquivo rules.json dentro de data eteja com um array vazio example: "[]" )
+- yarn runi
 
 ## Stack
 1. NodeJs/Typescript
