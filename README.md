@@ -22,7 +22,7 @@ esta api cadastra regras de horário para atendimento em uma clinica e valida ca
 - [x] Validar cadastro de regras para evitar conflito de horários
 
 ### Links
-- [x] Postman invite = https://app.getpostman.com/join-team?invite_code=ca46f708e18a2dd31203a1a6b4cc2236
-- [x] Postman collection = https://www.getpostman.com/collections/18ffd378279361e6de97
-- [x] Docs = https://app.swaggerhub.com/apis-docs/rodrigoazv/cubos_desafios/1.0.0
-- [x] Trello Task = https://trello.com/b/MIDxFLQJ/cubos
+- [x] [Postman invite](https://app.getpostman.com/join-team?invite_code=ca46f708e18a2dd31203a1a6b4cc2236)
+- [x] [Postman collection](https://www.getpostman.com/collections/18ffd378279361e6de97)
+- [x] [Docs](https://app.swaggerhub.com/apis-docs/rodrigoazv/cubos_desafios/1.0.0)
+- [x] [Trello Task](https://trello.com/b/MIDxFLQJ/cubos)
