@@ -16,10 +16,10 @@
 3. Architecture REST api
 
 ## O que essa api faz ?
-- Cadastrar regras de horários para atendimento
-- Apagar regra de horário para atendimento
-- Listar regras de horários para atendimento
-- Listar horários disponíveis dentro de um intervalo
+- Cadastra regras de horários para atendimento
+- Apaga regra de horário para atendimento
+- Lista regras de horários para atendimento
+- Lista horários disponíveis dentro de um intervalo
 
 ### Descrição
 Levando em consideração que os inputs foram corretos ( Existe validação para alguns casos criticos )
