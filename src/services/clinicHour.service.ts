@@ -1,8 +1,7 @@
 const fs = require('fs')
-const rules = './src/data/rules.json'
-import { rulesHour } from '../entities/rules.entity'
-import { Hour } from '../entities/hour.entity'
-import { compareHours } from '../middleware/verifyFreeHours'
+import { rulesHour } from '@entities/rules.entity'
+import { Hour } from '@entities/hour.entity'
+import { compareHours } from '@middleware/verifyFreeHours'
 
 export const readFile = () => {
     const content = fs.readFileSync('./src/data/rules.json', 'utf-8')

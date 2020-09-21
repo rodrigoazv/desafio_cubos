@@ -61,7 +61,7 @@ class clinicHour {
    */
   public storeOneRule(req: Request, res: Response) {
     let rules = new rulesHour()
-    const { type, day, freeHours, date } = req.body
+    const { type, freeHours, date } = req.body
     try {
       freeHours.map((Hours: Hour) => {
         if (Hours.start > Hours.end) throw 'hour can not bee ilogical'
@@ -75,7 +75,7 @@ class clinicHour {
       // Se existe realiza um update
       if (selectedItem >= 0) {
         updateHour(selectedItem, dayHours)
-        return res.status(200).json({ status: 'ok', value: 'update' })
+        return res.status(202).json({ status: 'ok', value: 'update' })
       } else {
         let arrayData: Hour[] = dayHours.map((data: Hour) => {
           const valid = compareHours(data, date)
@@ -105,10 +105,10 @@ class clinicHour {
         rules.freeHours = arrayData
         cContent.push(rules)
         writeFile(cContent)
-        res.status(200).json({ status: 'ok' })
+        res.status(201).json({ status: 'item created' })
       }
     } catch (err) {
-      res.status(200).json({ err: err })
+      res.status(400).json({ err: err })
     }
   }
  /**
