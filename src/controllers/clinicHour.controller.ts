@@ -30,6 +30,7 @@ class clinicHour {
         freeHours.map((inputHours: Hour) => {//para cada hora do dia
           DayMatch.map(date => {//compare com o match
             const log = compareHours(inputHours, date.date)
+            console.log(log)
             if (log.error) {
               throw log.conflictDate
             }
@@ -47,7 +48,7 @@ class clinicHour {
         }
         cContent.push(slash)
       })
-      console.log(cContent)
+      writeFile(cContent)
       res.status(200).json({ status: 'ok' })
     } catch (err) {
       res.status(200).json({ err: err })
